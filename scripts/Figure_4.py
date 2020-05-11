@@ -197,12 +197,8 @@ def fig_mua(pos, num, gs, df, version='cor'):
         csd_col[1, i, 31-min_mit:63-min_mit] = sp_mtrx[0]
         csd_col[0, i, 31-min_mit:63-min_mit] = frq_max
     i=0
-    if version == 'cor':
-        mean_csd = np.mean(csd_col[1], axis=0)
-        std_csd = np.std(csd_col[1], axis=0)/(len(nazwy))**(1/2)
-    else: 
-        mean_csd = np.mean(csd_col[0], axis=0)
-        std_csd = np.std(csd_col[0], axis=0)/(len(nazwy))**(1/2)
+    mean_csd = np.mean(csd_col[1], axis=0)
+    std_csd = np.std(csd_col[1], axis=0)/(len(nazwy))**(1/2)
     py.plot(mean_csd+i, np.linspace(-31,32,64), color = 'black', marker = 'o')
     py.fill_betweenx(np.linspace(-31,32,64), mean_csd - std_csd, mean_csd + std_csd, color='black', alpha = 0.5)
     py.yticks([-12, -5, -1, 5], ['glom.', 'EPL', 'mitral', 'grn']) 
@@ -210,12 +206,8 @@ def fig_mua(pos, num, gs, df, version='cor'):
     py.axvline(0, ls ='--', color = 'grey')
     py.axvline(-0.5, ls ='--', color = 'grey')
     py.axvline(0.5, ls ='--', color = 'grey')
-    if version == 'cor': 
-        py.xlim(-1, 1)
-        py.xlabel('MUA histogram-HFO correlation', fontsize = fsize-4)
-    else: 
-        py.xlim(1,200)
-        py.xlabel('MUA histogram frequency', fontsize=fsize-4)
+    py.xlim(-1, 1)
+    py.xlabel('MUA histogram-HFO correlation', fontsize = fsize-4)
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
 
