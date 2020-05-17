@@ -106,9 +106,9 @@ def fig_spec(po, nazwa, title = 'HFO', pos=(0,4, 4,8)):
     if 'A16' in nazwa: backmin = 15
     else: backmin = 5 
     im= py.pcolormesh(spec_mtrx[-1,:-1]/60-backmin, spec_mtrx[:, -1], spec_mtrx[:-1, :-1],
-                      cmap = 'Greens', norm = LogNorm(vmin = 1e-6, vmax=1e-4))
+                      cmap = 'Greens', norm = LogNorm(vmin = 1e-7, vmax=5e-5))
     py.xlim(-5, 12)
-    py.ylim(1, 200)
+    py.ylim(1, 140)
     py.axvline(0, ls ='--', color = 'grey', lw = 3)
     py.colorbar(im)
     py.title(title, fontsize = 20)
@@ -125,7 +125,7 @@ def fig_bars(po, pos, typ = 'cp', typek ='bic', ypos=2.1, okno = 60):
         df = pd.read_excel(saveDir+'nbqx_data.xlsx')
         link = '-'
         last=180
-        y1, y2 = 1.5, 1.3
+        y1, y2 = 1.3, 1.3
     elif typek=='bic': 
         df = pd.read_excel(saveDir+'bic_data.xlsx')
         lista_rats = ['6', '7', '1', '2','9']
@@ -165,6 +165,11 @@ def fig_bars(po, pos, typ = 'cp', typek ='bic', ypos=2.1, okno = 60):
     # ax.scatter(np.zeros(len(lista_rats))+1.5-wd, hfo[0].mean(axis=1), color = 'black')
     # print('shape', delta[0].mean(axis=1).shape)
     # pvalue = np.round(stats(delta[0].mean(axis=1), delta[1].mean(axis=1)), 3)
+    
+    # print('shap', st.shapiro(delta[0].mean(axis=1))[1])
+    # print('shap', st.shapiro(delta[1].mean(axis=1))[1])
+    # print('shap', st.shapiro(hfo[0].mean(axis=1))[1])
+    # print('shap', st.shapiro(hfo[1].mean(axis=1))[1])  
     pvalue = np.round(st.f_oneway(delta[0].mean(axis=1), delta[1].mean(axis=1))[1], 5)
     print(typek, ' delta', pvalue)
     py.text(-0.2, y1, pval(pvalue))
@@ -215,8 +220,10 @@ eles = np.linspace(1,32,32)
 fig = py.figure(figsize = (18,20), dpi = 250)
 gs = gridspec.GridSpec(16, 24, hspace=0.1, wspace=4)
 fig_spec(6, 'Rat_A23_carbo.npy',title = 'CBX infusion', pos = (0, 7, 12, 16))
-fig_spec(0, 'RAT4-KX-OB-NBQX2ug_3.npy',title = 'CNQX infusion', pos = (0, 7, 0, 4))
+fig_spec(0, 'RAT4-KX-OB-NBQX2ug_3.npy',title = 'NBQX infusion', pos = (0, 7, 0, 4))
 fig_spec(3, 'RAT_A16_03219-ok.npy',title = 'Bicuculline infusion', pos = (0, 7, 6, 10))
+# fig_spec(3, 'RAT_A22_201219-bic_Left.npy',title = 'Bicuculline infusion', pos = (0, 7, 6, 10))
+
 # fig_spec(6, 'RAT4-KX-OB-NBQX2ug_3_ctrl.npy',title = 'PFC removal', pos = (0, 7, 18, 22))
 
 plot_mean_podf(7, tit = 'Norm. HFO power', typ = 'HFO', typek = 'rbo', label='CBX', pos = (13, 19, 12, 16))

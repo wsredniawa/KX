@@ -48,11 +48,11 @@ loaddir = './fig4_files/saved_csd/'
 df = pd.read_excel('./fig4_files/hist_table.xlsx', index_col = 0)
 df_csd = pd.read_excel('./fig4_files/csd_table.xlsx', index_col = None) 
 
-fig = py.figure(figsize = (10,12), dpi = 260)
+fig = py.figure(figsize = (12,8), dpi = 200)
 gs = gridspec.GridSpec(4, 6, hspace=4, wspace=4)
 
 figprof(pos=(0,6,0,2), let = 'A', lowpass = 0.3, highpass = 5, title='Delta')
 figprof(pos=(0,6,2,4), let = 'B', lowpass = 80, highpass = 130, title='KX HFO')
 
-py.savefig('/Users/Wladek/Dysk Google/Figures for HFO in olfactory bulb/pub2_paper/figs/Figure_4_figure supplement 1.png')
+py.savefig('/Users/Wladek/Dysk Google/Figures for HFO in olfactory bulb/pub2_paper/figs/Figure_4_figuresupplement1.png')
 py.close()

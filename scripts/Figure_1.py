@@ -47,7 +47,7 @@ def plot_mean_podf(po, sz= 200, typ = 'cp', typek ='', pos=(0,4, 4,8)):
     df = pd.read_excel(saveDir+'g_and_h.xlsx')
     df2 = pd.read_excel(saveDir+'Injection times.xlsx')
     if 'xyl' in typek: color='purple'
-    else: color='indianred'
+    else: color='red'
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
     plot_len = 55
@@ -64,22 +64,22 @@ def plot_mean_podf(po, sz= 200, typ = 'cp', typek ='', pos=(0,4, 4,8)):
         hfo[i] = df[lista_rats[i]+'HFO_' + typ+typek].values[start-min_minus:start+min_plus]
         gamma[i] = df[lista_rats[i]+ 'gamma_' + typ+typek].values[start-min_minus:start+min_plus]
         # py.plot(hfo[i], color='indianred')
-        # py.plot(gamma[i], color = 'navy')
+        # py.plot(gamma[i], color = 'blue')
     sem = len(lista_rats)**(1/2)
     m_hfo = hfo.mean(axis=0)
     s_hfo = hfo.std(axis=0)/sem
     m_gamma = gamma.mean(axis=0)
     s_gamma = gamma.std(axis=0)/sem
-    py.plot(time_gh, m_gamma, color = 'navy')
-    py.fill_between(time_gh, m_gamma - s_gamma, m_gamma + s_gamma, alpha = 0.3, color = 'navy')
+    py.plot(time_gh, m_gamma, color = 'blue')
+    py.fill_between(time_gh, m_gamma - s_gamma, m_gamma + s_gamma, alpha = 0.3, color = 'blue')
     py.plot(time_gh, m_hfo, color = color)
-    py.fill_between(time_gh, m_hfo - s_hfo, m_hfo + s_hfo, alpha = 0.3, color = 'indianred')
+    py.fill_between(time_gh, m_hfo - s_hfo, m_hfo + s_hfo, alpha = 0.3, color = color)
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
-    py.ylabel('Power of dom. freq.', fontsize = fsize)
+    py.ylabel('Power of dom. freq.($mV^2$)', fontsize = fsize)
     py.yscale('log')
     py.xlabel('Time (min)', fontsize = fsize)
-    ax = py.subplot(gs[pos[2]:pos[3], pos[1]+1:pos[1]+6])
+    ax = py.subplot(gs[pos[2]:pos[3], pos[1]+1:pos[1]+5])
     set_axis(ax, -0.05, 1.1, letter= letters[po+1])
     bef_gamma, rly_gamma, lat_gamma = [], [], []
     bef_hfo, rly_hfo, lat_hfo= [], [], []
@@ -94,7 +94,7 @@ def plot_mean_podf(po, sz= 200, typ = 'cp', typek ='', pos=(0,4, 4,8)):
         #     py.plot([hfo[i, bs-3:bs].mean(), hfo[i,early_s:early_f].mean(), hfo[i, late_s:late_f].mean()], marker = 'o', color = 'indianred')
         # else:
         py.plot([hfo[i, bs-5:bs].mean(), hfo[i,early_s:early_f].mean(), hfo[i, late_s:late_f].mean()], marker = 'o', color = color)
-        py.plot([gamma[i, bs-5:bs].mean(), gamma[i,early_s:early_f].mean(), gamma[i, late_s:late_f].mean()], marker = 'o', color = 'navy')
+        py.plot([gamma[i, bs-5:bs].mean(), gamma[i,early_s:early_f].mean(), gamma[i, late_s:late_f].mean()], marker = 'o', color = 'blue')
         # py.text(-.1, hfo[i, bs-3:bs].mean(), lista_rats[i])
     
     results[typek+'bef_gamma'] = bef_gamma
@@ -110,31 +110,39 @@ def plot_mean_podf(po, sz= 200, typ = 'cp', typek ='', pos=(0,4, 4,8)):
    
     shift=np.asarray(rly_hfo).mean()/10
     max_ind = np.max(np.array([rly_hfo, lat_hfo])) 
+    print('shap', st.shapiro(bef_gamma)[1])
+    print('shap', st.shapiro(rly_gamma)[1])
+    print('shap', st.shapiro(lat_gamma)[1])
     pvalue = st.ttest_rel(bef_gamma, rly_gamma)[1]
+    print('gamma pval', pvalue)
     py.text(.9, max_ind+shift, pval(pvalue), color='blue')  
     pvalue = st.ttest_rel(bef_gamma, lat_gamma)[1]
     py.text(1.9, max_ind+shift, pval(pvalue), color='blue') 
     
     shift=np.asarray(rly_hfo).mean()*2
+    print('shap', st.shapiro(bef_hfo)[1])
+    print('shap', st.shapiro(rly_hfo)[1])
+    print('shap', st.shapiro(lat_hfo)[1])
     pvalue = st.ttest_rel(bef_hfo, rly_hfo)[1]
+    print('hfo pval', pvalue)
     py.text(.9, max_ind + shift, pval(pvalue), color=color)  
     pvalue = st.ttest_rel(bef_hfo, lat_hfo)[1]
     py.text(1.9, max_ind + shift, pval(pvalue), color=color) 
     
-    py.ylabel('Power of dom. freq.', fontsize = fsize)
+    py.ylabel('Power of dom. freq.($mV^2$)', fontsize = fsize)
     py.yscale('log')
     py.xticks([0,1,2], ['base', 'early Ket', 'late Ket'], fontsize=fsize) 
     if typek=='xyl': 
         py.xticks([0,1,2], ['base', 'early KX', 'late KX'], fontsize=fsize)
     else:
-        ket = mpatches.Patch(color='indianred', label='HFO after Ket.')
+        ket = mpatches.Patch(color='red', label='HFO after Ket.')
         kx = mpatches.Patch(color='purple', label='HFO after KX')
-        gam = mpatches.Patch(color='navy', label='Gamma 30-65 Hz')
-        ax.legend(handles=[ket,kx,gam], loc='center', bbox_to_anchor=(-0.1, 1.5), ncol=3, 
+        gam = mpatches.Patch(color='blue', label='Gamma 30-65 Hz')
+        ax.legend(handles=[ket,kx,gam], loc='center', bbox_to_anchor=(1.7, 0.5), ncol=1, 
                   frameon = True, fontsize = 20)
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
-    py.xlim(-0.5, 2.5)
+    py.xlim(-.2, 2.2)
 
 def fig_freq(po, pos, typek = 'df', okno = 60):
     ax = py.subplot(gs[pos[2]:pos[3], pos[0]:pos[1]])
@@ -151,7 +159,7 @@ def fig_freq(po, pos, typek = 'df', okno = 60):
         start2 = row['xyl'].values[0]/okno
         hfo[0,i] = df[lista_rats[i]+'HFO_' +typek+'_25'].values[int(start1)-min_minus:int(start1)+min_plus]
         hfo[1,i] = df[lista_rats[i]+'HFO_'+typek+ 'xyl'].values[int(start2)-min_minus:int(start2)+min_plus]
-        py.plot([0,2], [hfo[0,i, early_s:early_f].mean(), hfo[1,i, late_s:late_f].mean()], '-o', color='indianred')
+        py.plot([0,2], [hfo[0,i, early_s:early_f].mean(), hfo[1,i, late_s:late_f].mean()], '-o', color='red')
         py.plot([2], [hfo[1,i, late_s:late_f].mean()], 'o', color='purple')
         # py.text(-0.1, hfo[0,i, early_s:early_f].mean(), lista_rats[i])
     m_h_k25, s_h_k25 = hfo[0,:, early_s:early_f].mean(), hfo[0,:, early_s:early_f].std()
@@ -163,10 +171,12 @@ def fig_freq(po, pos, typek = 'df', okno = 60):
     results.to_excel(saveDir+ 'results.xlsx', sheet_name='sheet1', index=False)
     print('xyl freq mean and sd: ', m_h_xyl, s_h_xyl)
     print('ket25 freq mean and sd: ',m_h_k25, s_h_k25)
+    print('shap', st.shapiro(list(hfo[0,:, early_s:early_f].mean(axis=1)))[1])
+    print('shap', st.shapiro(list(hfo[1,:, late_s:late_f].mean(axis=1)))[1])
     pvalue = st.ttest_rel(hfo[0,:, early_s:early_f].mean(axis=1), hfo[1,:, late_s:late_f].mean(axis=1))[1]
     print('freq pvalue: ', str(pvalue))
     py.text(1.8, 150, pval(pvalue), color='purple')
-    py.xticks([0, 2], ['Ketamine', 'KX'], fontsize = fsize)
+    py.xticks([0, 2], ['Ket.', 'KX'], fontsize = fsize)
     py.xlim(-1, 3)
     py.ylim(100, 200)
     py.ylabel("Frequency (Hz)", fontsize= fsize)
@@ -210,8 +220,8 @@ def fig_hht(po, pos, rat = '67', part ='k25', name = 'baseline'):
 #    lfp = np.load(rat+part[5:8]+'_LFP.npy')
     time = np.linspace(0, dur*1000, dur*Fss)
     lista_comp = [-1, 0, 2]
-    if 'xyl' in part: colors = ['black', 'purple', 'navy']
-    else: colors = ['black', 'indianred', 'navy']
+    if 'xyl' in part: colors = ['black', 'purple', 'blue']
+    else: colors = ['black', 'red', 'blue']
 #    czas = int(part[8:10])*60*Fss
     [b_delta,a_delta] =  butter(2.,[0.1/(Fss/2.0), 200/(Fss/2.0)] ,btype = 'bandpass')
     bs[-1] = filtfilt(b_delta,a_delta, bs[-1])/np.max(abs(bs[-1]))
@@ -235,30 +245,36 @@ def fig_hht(po, pos, rat = '67', part ='k25', name = 'baseline'):
     ax.spines['top'].set_visible(False)
     py.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
     py.yticks(fontsize= 11)
-    py.xticks([50,100,150], [50,100,150],fontsize=11)
+    py.xticks([50,150], [50,150],fontsize=13)
     py.xlim(0, 200)
     py.ylim(0,2*1e-4)
-
 #%%
-colors = ['brown', 'gray', 'olivedrab', 'darkgreen', 'royalblue', 'navy', 'darkorchid', 'red', 'y', 'teal',
+colors = ['red', 'gray', 'reddrab', 'darkgreen', 'royalblue', 'blue', 'darkorchid', 'red', 'y', 'teal',
           'powderblue', 'b', 'black', 'magenta']
 Fss = 1394
 df = pd.read_excel("/Users/Wladek/Desktop/dok/schizo/" + 'hist_table.xlsx', index_col = 0)
 saveDir = './fig1_files/'
 eles = np.linspace(1,32,32)
 
-fig = py.figure(figsize = (20,20), dpi = 270)
-gs = gridspec.GridSpec(25, 18, hspace=4, wspace=1)
+fig = py.figure(figsize = (20,18), dpi = 300)
+gs = gridspec.GridSpec(18, 18, hspace=4, wspace=4)
 
-fig_hht(0, pos = (0, 4, 18, 25), part = saveDir+'hht67k2510.npy', name = 'Baseline')
-fig_hht(1, pos = (6, 10, 18, 25), part = saveDir+'hht67k2527.npy', name = 'Ketamine 20 mg/kg')
-fig_hht(2, pos = (12, 16, 18, 25), part = saveDir+'hht67xyl40.npy', name = 'Ketamine 100 mg/kg + xylazine 10 mg/kg')
+fig_hht(0, pos = (0, 4, 0, 7), part = saveDir+'hht67k2510.npy', name = 'Baseline')
+fig_hht(1, pos = (6, 10, 0, 7), part = saveDir+'hht67k2527.npy', name = 'Ketamine 20 mg/kg')
+fig_hht(2, pos = (12, 16, 0, 7), part = saveDir+'hht67xyl40.npy', name = 'Ketamine 100 mg/kg + xylazine 10 mg/kg')
 
-fig_spec(0, 'RAT67_Ket25.npy', title='Ketamine', pos = (0, 5, 0, 4))
-fig_spec(3, 'RAT67_Ketyl.npy', title='Ketamine-Xylazine', pos = (0, 5, 5, 9))
-plot_mean_podf(1, typek = '_25', typ = 'podf', pos = (6, 10, 0, 4))
-plot_mean_podf(4, typek = 'xyl', typ = 'podf', pos = (6, 10, 5, 9))
-fig_freq(6, pos = (0, 3, 11, 16))
+fig_spec(3, 'RAT67_Ket25.npy', title='Ketamine', pos = (0, 5, 9, 13))
+fig_spec(6, 'RAT67_Ketyl.npy', title='Ketamine-Xylazine', pos = (0, 5, 14, 18))
+plot_mean_podf(4, typek = '_25', typ = 'podf', pos = (6, 10, 9, 13))
+plot_mean_podf(7, typek = 'xyl', typ = 'podf', pos = (6, 10, 14, 18))
+fig_freq(9, pos = (16, 18, 14, 18))
+
+#fig_hist((1, 5, 10, 15), 'H', name = 'polar_gamma.png', tit = 'baseline gamma')
+#fig_hist((6, 10, 10, 15), 'I', name = 'polar_ket25.png', tit = 'ketamine 20 mg/kg')
+# fig_polar((3, 8, 21, 25), 'K', 'gamma.npy', 'blue')
+# fig_polar((8, 13, 21, 25), 'L', 'ket25.npy', 'indianred')
+# fig_polar((13, 18, 21, 25), 'M', 'ketxyl.npy', 'purple')
 
 py.savefig('/Users/Wladek/Dysk Google/Figures for HFO in olfactory bulb/pub2_paper/figs/Figure_1.png')
 py.close()
+#figD(9)

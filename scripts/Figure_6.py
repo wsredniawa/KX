@@ -16,7 +16,7 @@ from scipy.interpolate import splrep,sproot
 import pylab as py
 import pandas as pd
 import os
-from scipy.stats import ttest_rel
+from scipy.stats import ttest_rel, shapiro
 import matplotlib.image as mpimg
 from scipy.signal import welch, correlate, butter, filtfilt, spectrogram
 import spike_lib_lor as sl
@@ -78,22 +78,26 @@ def plot_mean_cut(po, pos, sz= 200, typ = 1, typek ='', tit = 'power'):
     
     fsize = 13
     if tit=='Power': 
-        py.ylim(0, 1.5e-4)
+        py.ylim(0, 1.2e-4)
         py.gca().ticklabel_format(axis='y', style='sci', scilimits=(0,0))
         pvalue = ttest_rel(hfo_befI, hfo_endI)[1]
         print(pvalue)
-        py.text(1.5, 1*1e-4, pval(pvalue), fontsize=fsize)
+        print('shap', shapiro(hfo_befI)[1], shapiro(hfo_endI)[1])
+        # py.text(1.5, 1*1e-4, pval(pvalue), fontsize=fsize)
         pvalue = ttest_rel(hfo_befC, hfo_endC)[1]
         print(pvalue)
-        py.text(2.1, 1.1*1e-4, pval(pvalue), fontsize=fsize)
+        print('shap', shapiro(hfo_befC)[1], shapiro(hfo_endC)[1])
+        # py.text(2.1, 1.1*1e-4, pval(pvalue), fontsize=fsize)
     else: 
-        py.ylim(50, 200)
+        py.ylim(50, 160)
         pvalue = ttest_rel(hfo_befI, hfo_endI)[1]
+        print('shap', shapiro(hfo_befI)[1], shapiro(hfo_endI)[1])
         print(pvalue)
-        py.text(1.5, 120, pval(pvalue), fontsize=fsize)
+        # py.text(1.5, 120, pval(pvalue), fontsize=fsize)
         pvalue = ttest_rel(hfo_befC, hfo_endC)[1]
+        print('shap', shapiro(hfo_befC)[1], shapiro(hfo_endC)[1])
         print(pvalue)
-        py.text(2.1, 110, pval(pvalue), fontsize=fsize)
+        # py.text(2.1, 110, pval(pvalue), fontsize=fsize)
     if po==3:
         py.legend(loc='center', bbox_to_anchor=(1.1, 1.2), 
                   ncol=2, frameon = True, fontsize = 14)

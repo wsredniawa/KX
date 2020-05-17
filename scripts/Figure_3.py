@@ -26,7 +26,7 @@ from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
 from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 import matplotlib.ticker as ticker
 from figure_properties import * 
-from scipy.stats import f_oneway, kruskal, ttest_rel
+from scipy.stats import f_oneway, kruskal, ttest_rel, shapiro
 py.close('all')
 letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 fsize = 20
@@ -104,7 +104,7 @@ def figMI(let, pos, nazwy = ['008']):
 
 def figA(let, pos, name):
     ax = py.subplot(gs[pos[2]:pos[3], pos[0]:pos[1]])
-    set_axis(ax, -0.05, 1.05, letter= let)
+    set_axis(ax, -0.05, 1, letter= let)
     y = np.load(loaddir +'lfp_raw'+ name+'.npy')
     Fss = 1250
     sts = 10*Fss
@@ -127,7 +127,7 @@ def figA(let, pos, name):
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
     ax.spines['bottom'].set_visible(False)
-    py.yticks([0.02, -0.07, -0.12], ['Breath', 'delta', 'HFO'], fontsize = fsize)
+    py.yticks([0.02, -0.07, -0.12], ['Nasal resp.', 'Delta', 'HFO'], fontsize = fsize)
 #    ax.text(2, 0.08, 'Breathig rhythm', fontsize = 10)
 #    ax.text(2, -0.03, 'Local delta', fontsize = 10)
 #    ax.legend(loc='center', bbox_to_anchor=(2, -0.25), ncol=2, frameon = False)
@@ -160,7 +160,7 @@ def fig_cor(let, pos):
     
 def figC(let,pos, name):
     ax = py.subplot(gs[pos[2]:pos[3], pos[0]:pos[1]])
-    set_axis(ax, -0.05, 1.05, letter= let)
+    set_axis(ax, -0.05, 1, letter= let)
     y = np.load(loaddir +'lfp_raw'+ name+'.npy')
     Fss = 1250
     sts = 10*Fss
@@ -169,7 +169,7 @@ def figC(let,pos, name):
     [b_bg2,a_bg2] = butter(3.,[0.1/(Fss/2.0), 8/(Fss/2.0)] ,btype = 'bandpass')
 
     sig = filtfilt(b_bg2,a_bg2, y[0,:sts])
-    py.plot(time, sig - 0.07,alpha = .5, label = 'delta', linewidth=2, color = 'indianred')
+    py.plot(time, sig - 0.07,alpha = .5, label = 'Delta', linewidth=2, color = 'indianred')
     sig = filtfilt(b_bg, a_bg, y[0,:sts])
     py.plot(time, sig*2 - 0.12,alpha = .5, label = 'HFO', linewidth=0.5, color= 'black')
     py.xlim(3.2, 4)
@@ -185,7 +185,7 @@ def figC(let,pos, name):
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
     ax.spines['bottom'].set_visible(False)
-    py.yticks([-0.07, -0.12], ['delta', 'HFO'], fontsize = fsize-2)
+    py.yticks([-0.07, -0.12], ['Delta', 'HFO'], fontsize = fsize-2)
 
 def fig_spec(let, pos, kan, tit):
     ax = py.subplot(gs[pos[2]:pos[3], pos[0]:pos[1]])
@@ -215,16 +215,24 @@ def fig_statnb(let, pos):
     bef_C = df_loc['bef_C'].values[:-1]
     dur_C = df_loc['dur_C'].values[:-1]
     aft_C = df_loc['aft_C'].values[:-1]
-    py.errorbar([0.05,1.05,2.05], [bef_I.mean(), dur_I.mean(), aft_I.mean()], yerr=[bef_I.std(), dur_I.std(), aft_I.std()], 
+    sem = np.sqrt(len(bef_I))
+    py.errorbar([0.05,1.05,2.05], [bef_I.mean(), dur_I.mean(), aft_I.mean()], yerr=[bef_I.std()/sem, dur_I.std()/sem, aft_I.std()/sem], 
                 fmt='-o', color = 'b', label = 'Naris block')
-    py.errorbar([0,1,2], [bef_C.mean(), dur_C.mean(), aft_C.mean()], yerr=[bef_C.std(), dur_C.std(), aft_C.std()], 
+    py.errorbar([0,1,2], [bef_C.mean(), dur_C.mean(), aft_C.mean()], yerr=[bef_C.std()/sem, dur_C.std()/sem, aft_C.std()/sem], 
                 fmt='-o', ls = '--', color = 'g', label = 'Control')
     py.xticks([0,1,2], ['before', 'during' , 'after'], fontsize = fsize)
     ax.legend(loc='center', bbox_to_anchor=(1.1, 1.2), ncol=2,frameon = True, fontsize = 20)
     
+    print('shap', shapiro(bef_I)[1])
+    print('shap', shapiro(bef_C)[1])
+    print('shap', shapiro(dur_I)[1])
+    print('shap', shapiro(dur_C)[1])
+    print('shap', shapiro(aft_I)[1])
+    print('shap', shapiro(aft_C)[1])
     pvalue = f_oneway(bef_I, bef_C)[1]
     py.text(-.1, 2.5*1e-4, pval(pvalue))
     pvalue = f_oneway(dur_C, dur_I)[1]
+    print(pvalue)
     py.text(0.95, 2.5*1e-4, pval(pvalue))
     pvalue = f_oneway(aft_I, aft_C)[1]
     py.text(1.9, 2.5*1e-4, pval(pvalue))
@@ -286,9 +294,9 @@ fig_spec('A2', (0,3, 2,4), kan = 1, tit = 'Contralateral')
 fig_statnb('B', (3,6, 0,4))
 
 # figHist('D', (0,3, 5,9))
-figA('D', (0,3, 5,9), '009')
-figC('E', (3,6, 5,9), '009')
-fig_polar((6, 9, 5, 9), 'F', 'ketxyl.npy', 'purple')
+figA('D', (0,3, 4,9), '009')
+figC('E', (3,6, 4,9), '009')
+fig_polar((6, 9, 5, 8), 'F', 'ketxyl.npy', 'purple')
 
 fig_cor('G', (0,3, 9,13))
 figMI('H', (3,6, 9,13), nazwy = nazwy)

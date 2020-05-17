@@ -197,8 +197,12 @@ def fig_mua(pos, num, gs, df, version='cor'):
         csd_col[1, i, 31-min_mit:63-min_mit] = sp_mtrx[0]
         csd_col[0, i, 31-min_mit:63-min_mit] = frq_max
     i=0
-    mean_csd = np.mean(csd_col[1], axis=0)
-    std_csd = np.std(csd_col[1], axis=0)/(len(nazwy))**(1/2)
+    if version == 'cor':
+        mean_csd = np.mean(csd_col[1], axis=0)
+        std_csd = np.std(csd_col[1], axis=0)/(len(nazwy))**(1/2)
+    else: 
+        mean_csd = np.mean(csd_col[0], axis=0)
+        std_csd = np.std(csd_col[0], axis=0)/(len(nazwy))**(1/2)
     py.plot(mean_csd+i, np.linspace(-31,32,64), color = 'black', marker = 'o')
     py.fill_betweenx(np.linspace(-31,32,64), mean_csd - std_csd, mean_csd + std_csd, color='black', alpha = 0.5)
     py.yticks([-12, -5, -1, 5], ['glom.', 'EPL', 'mitral', 'grn']) 
@@ -206,8 +210,12 @@ def fig_mua(pos, num, gs, df, version='cor'):
     py.axvline(0, ls ='--', color = 'grey')
     py.axvline(-0.5, ls ='--', color = 'grey')
     py.axvline(0.5, ls ='--', color = 'grey')
-    py.xlim(-1, 1)
-    py.xlabel('MUA histogram-HFO correlation', fontsize = fsize-4)
+    if version == 'cor': 
+        py.xlim(-1, 1)
+        py.xlabel('MUA histogram-HFO correlation', fontsize = fsize-4)
+    else: 
+        py.xlim(1,200)
+        py.xlabel('MUA histogram frequency', fontsize=fsize-4)
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
 
@@ -264,11 +272,9 @@ for ll in range(4):
 ele_typ = 32
 r32 = '098'
 figHist(0, '32', name2 = '32', pos=(0,3,0,7))
-figLFP(1, [r32], filt = False, title = '$100$ $\mu m$ spacing electrodes', pos=(3,6,0,8))
-#figLFP(2, [r32],  lp=80, hp=180, title = 'HFO filtered', pos=(6,8,0,4))
-#figLFP(3,  [r32], lp=0.1, hp=2, title = 'Delta filtered', pos=(6,8,4,8))
-fig_power(2, pos=(6,9,0,7))
-fig_phase(3, pos=(9,12,0,7))
+figLFP(1, [r32], filt = False, title = '$100$ $\mu m$ spacing electrodes', pos=(3,7,0,8))
+fig_power(2, pos=(7,10,0,7))
+fig_phase(3, pos=(10,13,0,7))
 
 nazwy = ['022', '027', '114', '116', '117', '127', '128', '129']
 # nazwy[:2]  = ['022', '027']
@@ -286,12 +292,12 @@ for ll in range(4):
         csd_col[ll, i, 31-mit_pos[miti]:63-mit_pos[miti]] = y
 ele_typ = 20
 figHist(4, '20', name2 = '20', pos=(0,3,9,16))
-figLFP(5, ['022'], filt = False, title = '$20$ $\mu m$ spacing electrodes', pos=(3,6,9,17))
+figLFP(5, ['022'], filt = False, title = '$20$ $\mu m$ spacing electrodes', pos=(3,7,9,17))
 
 
 
-fig_power(6, pos=(6,9,9,16))
-fig_phase(7, pos=(9,12,9,16))
+fig_power(6, pos=(7,10,9,16))
+fig_phase(7, pos=(10,13,9,16))
 #fig_hist(pos=(0,3, 18, 25), gs= gs, num='A', name='116')
 figCSDraw(pos=(0,4,18, 25), gs=gs, df=df, num='I', nazwa = ['116'])
 figCSD(pos=(4,7,18, 25), gs=gs, df=df, num = 'J', lowpass = 0.3, highpass = 5)

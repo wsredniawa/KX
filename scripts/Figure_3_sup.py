@@ -20,7 +20,7 @@ import matplotlib.gridspec as gridspec
 from figure_properties import *
 import matplotlib as mpl
 from neo.io import Spike2IO
-from scipy.stats import f_oneway
+from scipy.stats import f_oneway, shapiro
 from matplotlib.colors import LogNorm
 
 mpl.rcParams['axes.spines.right'] = False
@@ -58,6 +58,7 @@ def fig_power(po, pos, sigs, typ=0, okno=60, Fs= 1000, low_freq=65):
     py.bar([1], mean, yerr=std, color='grey', alpha=0.6)
     print('kx freq: ', kx_freq.mean(), kx_freq.std()/np.sqrt(len(kx_freq)))
     print('iso kx: ', isokx.mean(), isokx.std()/np.sqrt(rats_num))
+    print('shap', shapiro(kx_freq)[1], shapiro(isokx)[1])
     pvalue=f_oneway(kx_freq, isokx)[1]
     print(pvalue)
     py.text(0.5, 150, pval(pvalue))
